@@ -34,7 +34,7 @@ impl WordGenerator for DefaultGenerator {
     }
 }
 
-impl CharGenerator for DefaultGenerator {
+impl CharGenerator for &DefaultGenerator {
     fn take_random_char(&self) -> char {
         let word = self.grammar.take_random();
         word.take_random()

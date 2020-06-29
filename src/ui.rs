@@ -1,6 +1,10 @@
 use std::io::stdin;
+
+use js_sys::*;
+use wasm_bindgen::prelude::*;
+
 use crate::generator::*;
-use crate::model::{WordFactory, Word, Board};
+use crate::model::{Board, Word, WordFactory};
 
 pub fn place_words(board: &mut Board, words: Vec<&str>, gen: &DefaultGenerator) {
     for _ in 0..words.len() {
@@ -19,16 +23,24 @@ fn generate_word(gen: &mut impl WordGenerator, board: &Board) -> Word {
     board.create_word(word, orientation)
 }
 
-pub fn init_generator(words: &Vec<&str>) -> DefaultGenerator {
-    let words_set = words.iter().map(ToString::to_string).collect();
+pub fn init_generator(words: Array) -> DefaultGenerator {
+    let words_set = words.map(&mut |w, _, _| w.as_string().unwrap()).collect();
     let gen = DefaultGenerator::new(words_set);
     gen
 }
 
-pub fn read_sz() -> usize {
+#[wasm_bindgen]
+pub fn read_sz() -> u32 {
     println!("No board size were given as arguments. Please specify it below:");
     let mut sz = String::new();
     stdin().read_line(&mut sz).expect("Something went wrong during input");
-    let size = sz.trim().parse::<usize>().expect("Expected board size");
+    let size = sz.trim().parse::<u32>().expect("Expected board size");
     size
+}
+
+pub fn fill_board(mut board: &mut Board, words: Array) {
+    let vector = words.map(&mut |v, _, _| JsValue::as_string(v).unwrap()).collect();
+    let gen = DefaultGenerator::new(&vector);
+    place_words(&mut board, vector, &gen);
+    board.fill_blank_slots(gen);
 }

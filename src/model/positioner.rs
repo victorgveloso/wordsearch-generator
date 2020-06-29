@@ -9,7 +9,7 @@ pub trait Positioner {
 
 impl Positioner for Board {
     fn gen_valid_pos(self: &Self, word: &String, orient: &Orientation) -> (usize, usize) {
-        let board_size = self.elements.len();
+        let board_size = self.size as usize;
         let mut position;
 
         while {
@@ -29,13 +29,11 @@ impl Positioner for Board {
         position
     }
 
-    fn has_collision(self: &Self, word: &String, orient: &Orientation, position: (usize, usize)) -> bool {
+    fn has_collision(self: &Self, word: &String, orient: &Orientation, (x, y): (usize, usize)) -> bool {
         for (i, v) in word.chars().into_iter().enumerate() {
-            let elem = match orient {
-                Orientation::HOR => self.elements[position.0 + i][position.1].clone(),
-                Orientation::VERT => self.elements[position.0][position.1 + i].clone(),
-            };
-            if elem != Board::default_symbol() && elem != v.to_string() {
+            let pos = self.get_oriented_pos(x as u32, y as u32, *orient, i as u32);
+            let elem = &self.elements.get(pos);
+            if *elem != Board::default_symbol() && *elem != v.to_string() {
                 return true;
             }
         }
