@@ -25,7 +25,7 @@ impl<T> TakeRandom<T> for Vec<T> {
 
 impl TakeRandomChar for String {
     fn take_random_idx(&self) -> usize {
-        rand::thread_rng().gen_range(0, self.len())
+        rand::thread_rng().gen_range(0, self.chars().count())
     }
 
     fn take_random(&self) -> char {

@@ -1,4 +1,5 @@
 use rand::Rng;
+use serde_derive::*;
 
 use word_set::TakeRandom;
 
@@ -16,7 +17,7 @@ pub trait CharGenerator {
     fn take_random_char(&self) -> char;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct DefaultGenerator {
     grammar: Vec<String>
 }
